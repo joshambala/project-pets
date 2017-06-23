@@ -176,7 +176,7 @@ $(document).ready(function() {
       + "&dist=" + distance
       + "&fmt=JSON&pgLen=5&UID=127.0.0.1"
       + "&apikey=8v2eyjyx79f4m3zcctsyqmxd";
-      
+
     requestCrossDomain(yellow, displayData);
   };
 
@@ -217,9 +217,9 @@ $(document).ready(function() {
     for (var i = 0; i < 5; i++) {
       getGiphy();
       var name = response.listings[i].name;
-      var address = response.listings[i].address.street
-        + response.listings[i].address.city
-        + response.listings[i].address.pcode
+      var address = response.listings[i].address.street + (" ")
+        + response.listings[i].address.city + (" ")
+        + response.listings[i].address.pcode + (" ")
         + response.listings[i].address.prov;
       var resultUrl = response.listings[i].merchantUrl;
       var phone = response.listings[i].phone.dispNum;
