@@ -5,17 +5,20 @@ var locations_lng = [];
 
 var map;
 var markers = [];
-
-
+var type_selected;
+var marker;
+var legend;
+var legend_created = false;
+var business = [];
+var merchant = {};
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
-            lat: 53.7813552,
-            lng: -112.1964913
-
+            lat: 57.598493,
+            lng: -101.825397,
         },
-        zoom: 4
+        zoom: 6
     });
     var card = document.getElementById('pac-card');
     var input = document.getElementById('pac-input');
@@ -26,6 +29,11 @@ function initMap() {
 
     var autocomplete = new google.maps.places.Autocomplete(input);
 
+    var options = {
+    types: ['(cities)'],
+     componentRestrictions: {country: "canada"}
+ };
+
     // Bind the map's bounds (viewport) property to the autocomplete object,
     // so that the autocomplete requests use the current map bounds for the
     // bounds option in the request.
@@ -34,7 +42,7 @@ function initMap() {
     var infowindow = new google.maps.InfoWindow();
     var infowindowContent = document.getElementById('infowindow-content');
     infowindow.setContent(infowindowContent);
-    var marker = new google.maps.Marker({
+    marker = new google.maps.Marker({
         map: map,
         anchorPoint: new google.maps.Point(0, -29)
     });
@@ -117,26 +125,28 @@ function initMap() {
             console.log("clicked a markr");
             $("#icon-info").text("Info of this marker");
             $("#icon-info").css("font-size", "20px");
-
-
         });
-
         markers.push(newmarker);
-
     });
-    // This creates the legend
 
-    // var legend = document.getElementById("legend");
-    // for (var key in icons) {
-    //     var type = icons[key];
-    //     var name = type.name;
-    //     var icon = type.icon;
-    //     var div = document.createElement('div');
-    //     div.innerHTML = '<img src="' + icon + '"> ' + name;
-    //     legend.appendChild(div);
-    // }
+if (legend_created === false) {
 
-    // map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+legend = document.getElementById("legend");
+    for (var key in icons) {
+        var type = icons[key];
+        var name = type.name;
+        var icon = type.icon;
+        var div = document.createElement('div');
+        div.innerHTML = '<img src="' + icon + '"> ' + name;
+        legend.appendChild(div);
+    }
+
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+
+    legend_created = true;
+
+    }
+
 }
 
 // THE CODE BELOW IS COMMENTED OUT BECAUSE IT MAKES THE CODE ABOVE MOT WORK
@@ -144,34 +154,32 @@ function initMap() {
 
 $(document).ready(function() {
 
+  function redoMap () {
 
+   map.setCenter({
 
-    function redoMap () {
+  lat: current_lat,
+  lng: current_lng
 
- map.setCenter({
+  })
 
- lat: current_lat,
- lng: current_lng
-    })
- 
- map.setZoom(10);
+   map.setZoom(13);
 
+   var card = document.getElementById('pac-card');
+   var input = document.getElementById('pac-input');
+   var types = document.getElementById('type-selector');
+   var strictBounds = document.getElementById('strict-bounds-selector');
 
- var card = document.getElementById('pac-card');
- var input = document.getElementById('pac-input');
- var types = document.getElementById('type-selector');
- var strictBounds = document.getElementById('strict-bounds-selector');
- 
- map.controls[google.maps.ControlPosition.TOP_RIGHT].push(card);
- 
- var autocomplete = new google.maps.places.Autocomplete(input);
+   map.controls[google.maps.ControlPosition.TOP_RIGHT].push(card);
+
+   var autocomplete = new google.maps.places.Autocomplete(input);
 
 
 // Bind the map's bounds (viewport) property to the autocomplete object,
  // so that the autocomplete requests use the current map bounds for the
  // bounds option in the request
 
- autocomplete.bindTo('bounds', map);
+autocomplete.bindTo('bounds', map);
 
 
 var infowindow = new google.maps.InfoWindow();
@@ -193,7 +201,7 @@ autocomplete.addListener('place_changed', function() {
              window.alert("No details available for input: '" + place.name + "'");
              return;
          }
- 
+
          // If the place has a geometry, then present it on a map.
         if (place.geometry.viewport) {
             map.fitBounds(place.geometry.viewport);
@@ -203,7 +211,7 @@ autocomplete.addListener('place_changed', function() {
          }
          marker.setPosition(place.geometry.location);
         marker.setVisible(true);
- 
+
         var address = '';
         if (place.address_components) {
              address = [
@@ -212,102 +220,94 @@ autocomplete.addListener('place_changed', function() {
                  (place.address_components[2] && place.address_components[2].short_name || '')
              ].join(' ');
          }
- 
+
          infowindowContent.children['place-icon'].src = place.icon;
          infowindowContent.children['place-name'].textContent = place.name;
          infowindowContent.children['place-address'].textContent = address;
          infowindow.open(map, marker);
      });
- 
- 
+
      var icons = {
-         grooming: {
+         pet_grooming: {
              name: 'Grooming',
              icon: 'assets/images/g.png'
          },
-         vet: {
+         veterinarian: {
              name: 'Vet',
              icon: 'assets/images/v.png'
          },
-         store: {
+         pet_store: {
              name: 'Pet Store',
              icon: 'assets/images/s.png'
          },
-         hospital: {
+         pet_hospital: {
              name: 'Pet Hospital',
              icon: 'assets/images/h.png'
          }
      };
 
+     // var features = [{
+     //    position: new google.maps.LatLng(business[0].geoCode_lat, business[0].geoCode_lng),
+     //    type: type_selected
+     //    },{
+     //    position: new google.maps.LatLng(business[1].geoCode_lat, business[1].geoCode_lng),
+     //    type: type_selected
+     //    }, {
+     //    position: new google.maps.LatLng(business[2].geoCode_lat, business[2].geoCode_lng),
+     //    type: type_selected
+     //    },{
+     //    position: new google.maps.LatLng(business[3].geoCode_lat, business[3].geoCode_lng),
+     //    type: type_selected
+     //    },{
+     //    position: new google.maps.LatLng(business[4].geoCode_lat, business[4].geoCode_lng),
+     //    type: type_selected
+     //    }];
 
-
-
-     var features = [{
-        position: new google.maps.LatLng(locations_lat[0], locations_lng[0]),
-        type: 'store' 
-        },{
-        position: new google.maps.LatLng(locations_lat[1], locations_lng[1]),
-        type: 'store' 
-        }, {
-        position: new google.maps.LatLng(locations_lat[2], locations_lng[2]),
-        type: 'store' 
-        },{
-        position: new google.maps.LatLng(locations_lat[3], locations_lng[3]),
-        type: 'store' 
-        },{
-        position: new google.maps.LatLng(locations_lat[4], locations_lng[4]),
-        type: 'store' 
-        }];
-
-        features.forEach(function(feature) {
-        var newmarker = new google.maps.Marker({
-            position: feature.position,
-            icon: icons[feature.type].icon,
+     //    features.forEach(function(feature) {
+     //    var newmarker = new google.maps.Marker({
+     //        position: feature.position,
+     //        icon: icons[feature.type].icon,
+     //        map: map
+     //    });
+        for (var i = 0; i < 5; i++){
+          var position = new google.maps.LatLng(business[i].geoCode_lat, business[i].geoCode_lng)
+          var newmarker = new google.maps.Marker({
+            position: position,
+            icon: icons[type_selected].icon,
+            name: business[i].name,
+            address: business[i].address,
+            phone: business[i].phone,
+            resultUrl: business[i].resultUrl,
             map: map
-
-        });
-
+          });
         newmarker.addListener('click', function() {
-            console.log("clicked a markr");
-            $("#icon-info").text("Info of this marker");
-            $("#icon-info").css("font-size", "20px");
-
-
+            var merchants = {
+              name: this.name,
+              address: this.address,
+              phone: this.phone,
+              webpage: this.resultUrl
+            }
+            database.ref('merchants').push(merchants);
         });
 
         markers.push(newmarker);
 
-    });
- 
-        
-
-         var legend = document.getElementById("legend");
-    for (var key in icons) {
-        var type = icons[key];
-        var name = type.name;
-        var icon = type.icon;
-        var div = document.createElement('div');
-        div.innerHTML = '<img src="' + icon + '"> ' + name;
-        legend.appendChild(div);
-    }
-
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
-
- 
+    };
  };
 // end of redo map
 
-    var config = {
-    apiKey: "AIzaSyCQ__vhHShTpCE-GENvH5K9jv8bX4iUdXg",
-    authDomain: "marksinsaneasylum.firebaseapp.com",
-    databaseURL: "https://marksinsaneasylum.firebaseio.com",
-    projectId: "marksinsaneasylum",
-    storageBucket: "marksinsaneasylum.appspot.com",
-    messagingSenderId: "587854779697"
-  }
-    firebase.initializeApp(config);
+
+  var config = {
+    apiKey: "AIzaSyBDtNjucWDga7GKDVepB2m7n_JxXP31ASo",
+    authDomain: "hacker-tails.firebaseapp.com",
+    databaseURL: "https://hacker-tails.firebaseio.com",
+    projectId: "hacker-tails",
+    storageBucket: "hacker-tails.appspot.com",
+    messagingSenderId: "519408053795"
+  };
+  firebase.initializeApp(config);
     // setting variables
-    var database = firebase.database();
+  var database = firebase.database();
 
   // this retrieves business data
   function getBizData() {
@@ -348,7 +348,7 @@ autocomplete.addListener('place_changed', function() {
           // If the user passed a callback, and it
           // is a function, call it, and send through the data var.
           if (typeof callback === 'function') {
-              console.log("madeIt");
+              // console.log("madeIt");
               callback(data.query.results.json);
           }
         }
@@ -358,25 +358,46 @@ autocomplete.addListener('place_changed', function() {
   };
 
   function displayData(response) {
+
+    // console.log("setVisible");
+    marker.setVisible(false);
+
+    locations_lat = [];
+    locations_lng = [];
+     for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+
     var dataSize = response.listings.length
-    console.log(dataSize );
+    // console.log(dataSize );
     for (var i = 0; i < 5; i++) {
       getGiphy();
       var name = response.listings[i].name;
-      var address = response.listings[i].address.street + (" ")
-        + response.listings[i].address.city + (" ")
-        + response.listings[i].address.pcode + (" ")
+      var address = response.listings[i].address.street
+        + response.listings[i].address.city
+        + response.listings[i].address.pcode
         + response.listings[i].address.prov;
       var resultUrl = response.listings[i].merchantUrl;
       var phone = response.listings[i].phone.dispNum;
       var geoCode = response.listings[i].geoCode.latitude
         + response.listings[i].geoCode.longitude;
+
       var geoCode_lat = response.listings[i].geoCode.latitude
       var geoCode_lng = response.listings[i].geoCode.longitude;
           locations_lat.push(geoCode_lat);
           locations_lng.push(geoCode_lng);
+
+      merchant = {
+        name: name,
+        address: address,
+        resultUrl: resultUrl,
+        phone: phone,
+        geoCode_lat: geoCode_lat,
+        geoCode_lng: geoCode_lng
+        }
+      business.push(merchant);
       var result = $("<p>")
-        .html("<u>" + name + "</u>" + "<br>" + "<strong>" + "Address: " + "</strong>" + address + "<br>" + "<strong>" + "Phone: " + "</strong>" + phone + "<br>" + "<strong>" + "<a href=" + resultUrl + ">" + "Website" + "</a>")
+        .html("<u id='busName'>" + name + "</u>" + "<br>" + "<strong>" + "Address: " + "</strong>" + "<u id='busAddress'>" + address + "</u>" + "<br>" + "<strong>" + "Phone: " + "</strong>" + "<u id='busPhone'>" + phone + "</u>" + "<br>" + "<strong>" + "<a target='_blank' id='busWebsite' href=" + resultUrl + ">" + "Website" + "</a>")
         .appendTo($("#displayAPI"));
       };
       redoMap();
@@ -423,6 +444,7 @@ autocomplete.addListener('place_changed', function() {
     event.preventDefault();
 
     var inputSelection = $('#selection-input').val();
+    type_selected = $('#selection-input').val().replace(" ", "_");
     var inputAddress = $('#pac-input').val();
     var inputAnimal = $('#animal-select').val();
     if (!inputSelection || !inputAddress || !inputAnimal) {
@@ -443,29 +465,44 @@ autocomplete.addListener('place_changed', function() {
     $('#pac-input').val('');
     $('#distance-input').val('');
     $('#animal-select').val('');
-    });
+  });
 
   function adoptPet() {
     var animal = $('#animal-select').val();
-    $.getJSON('http://api.petfinder.com/pet.find?format=json&animal='+animal+'&location=94112&key=1606f36e9c6ff9a9664c529cba6adff6&callback=?', function(result) {
+    var zipCode = $('#pac-input').val();
+    $.getJSON('http://api.petfinder.com/pet.find?format=json&animal='+animal+'&location='+zipCode+'&key=1606f36e9c6ff9a9664c529cba6adff6&callback=?', function(result) {
+      // console.log(result.petfinder.pets.pet[0].id);
       // console.log(result.petfinder.pets.pet[0].media.photos.photo[3]);
       var pet = result.petfinder.pets.pet;
+      var petID = pet[0].id;
       for (var i = 0; i < pet.length; i++) {
-        // $('#pet-view').prepend(JSON.stringify(result));
-        // console.log(pet[0]);
-        var petDiv = document.createElement('div');
-        petDiv.id = "carousel-image";
-        // petDiv.className += "item";
-        petDiv.className = "item item" + i;
-        var adoptable = pet[i].media.photos.photo[0];
+        var petDiv = $('<div id="carousel-image">')
+        .addClass('item item' + i)
+        var adoptable = pet[i].media.photos.photo[3];
         var petImg =  $('<img>')
         .attr('src', adoptable.$t)
+        .attr('data-id', petID.$t)
         .addClass('img-carousel')
+        .addClass('draggable')
         .addClass('center-block');
         $(petDiv).append(petImg);
         $('.carousel-inner').append(petDiv);
       }
     });
   }
-
+  function displayShow() {
+    database.ref('merchants').on('child_added', function(snapshot){
+      var merchant = snapshot.val();
+      $('#icon-info').prepend(merchant);
+       var show = $('<div id="showBiz">')
+            .append(merchant.name)
+            .append("<br>" + "Address: " + merchant.address)
+            .append("<br>" + "Phone: " + merchant.phone)
+            .append("<br>" + "<a target='_blank' href=" + merchant.resultUrl + ">" + "Webpage" + "</a>");
+      $('#icon-info').prepend(show);
+    }, function(errorObject) {
+      console.log('read failed: ' + errorObject);
+    })
+  }
+  displayShow();
 });

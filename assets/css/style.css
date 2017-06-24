@@ -1,19 +1,26 @@
-.navbar {
-  height: 150px;
+.navbar-brand {
+  margin: 0;
+  padding: 0;
 }
 
-h1 {
-  float: top;
-  font-size: 40px;
+.logo {
+  height: 100px;
+  float: center;
+  position: relative;
+  width: 250px;
+  border-radius: 160px;
+}
+
+.app-name {
+  position: absolute;
+  width: 100%;
+  font-size: 60px;
   font-family: 'Luckiest Guy', cursive;
   color: red;
 }
 
-.img-responsive {
-  margin-top: 0;
-  border-radius: 180px;
-  height: 150px;
-  width: 300px;
+.navbar-inverse {
+  height: 240px;
 }
 
 #map {
@@ -99,7 +106,7 @@ h1 {
 }
 
 .gifImage {
-  display: block;
+  border-radius: 5px;
   float: left;
   margin: auto;
   min-width: 150px;
@@ -107,14 +114,15 @@ h1 {
   max-width: 150px;
   max-height: 150px;
 }
-/*#displayAPI {
-  overflow: auto;
+
+#displayAPI {
+  float: left;
   margin: 10px 0 10px 10px;
   min-width: 200px;
   min-height: 200px;
   max-width: 200px;
   max-height: 200px;
-}*/
+}
 
 /* The Modal (background) */
 .modal {
@@ -160,8 +168,8 @@ h1 {
   display: inline-block;
 }
 .img-carousel {
-  max-height: 150px;
-  max-width: 150px;
-  min-width: 150px;
-  min-height: 150px;
+  max-height: 500px;
+  max-width: 500px;
+  min-width: 500px;
+  min-height: 500px;
 }
